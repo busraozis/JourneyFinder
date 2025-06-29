@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="Title" xml:space="preserve">
+    <value>Otobüs Yolculuğu Planlayıcı</value>
+  </data>
+    <data name="PageHeading" xml:space="preserve">
+    <value>Yolculuğunuzu Planlayın</value>
+  </data>
+    <data name="OriginLabel" xml:space="preserve">
+    <value>Nereden</value>
+  </data>
+    <data name="DestinationLabel" xml:space="preserve">
+    <value>Nereye</value>
+  </data>
+    <data name="SelectOption" xml:space="preserve">
+    <value>Seçiniz</value>
+  </data>
+    <data name="SwapButton" xml:space="preserve">
+    <value>Değiştir</value>
+  </data>
+    <data name="DepartureDateLabel" xml:space="preserve">
+    <value>Tarih</value>
+  </data>
+    <data name="Today" xml:space="preserve">
+    <value>Bugün</value>
+  </data>
+    <data name="Tomorrow" xml:space="preserve">
+    <value>Yarın</value>
+  </data>
+  <data name="SubmitButton" xml:space="preserve">
+    <value>Biletini Bul</value>
+  </data>
+  <data name="InvalidDestination" xml:space="preserve">
+    <value>Varış noktası geçersiz</value>
+  </data>
+  <data name="InvalidOrigin" xml:space="preserve">
+    <value>Kalkış noktası geçersiz</value>
+  </data>
+  <data name="OriginDestinationCannotBeSame" xml:space="preserve">
+    <value>Varış ve kalkış noktaları aynı olamaz</value>
+  </data>
+</root>

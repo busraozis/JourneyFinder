@@ -1,0 +1,447 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model JourneyFinder.Models.ViewModels.HomeIndexViewModel
+
+<div class="journey-banner">
+    <div class="journey-header">
+        <a class="back-button" style="visibility: hidden;">←</a>
+        <div class="journey-info">&nbsp;</div>
+    </div>
+    <div class="journey-date">&nbsp;</div>
+</div>
+
+<form asp-controller="Journey" asp-action="Index" method="post" class="form">
+    <div class="route-group">
+        <div class="route-pair">
+            <div class="route-input-container">
+                <div class="icon-label-wrapper">
+                    <span class="icon">🗺️</span>
+                    <div class="input-label-group">
+                        <label for="originInput">@Localizer["OriginLabel"]</label>
+                        <input type="text" id="originInput" name="OriginName" list="originList"
+                               value="@Model.OriginName" autocomplete="off" required />
+                        <input type="hidden" id="OriginId" name="OriginId" value="@Model.OriginId" />
+                        <datalist id="originList">
+                            @foreach (var loc in Model.Locations)
+                            {
+                                <option value="@loc.Text" data-id="@loc.Value"></option>
+                            }
+                        </datalist>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swap-icon-wrapper">
+                <div class="swap-icon" id="swapButton" title="@Localizer["SwapButton"]">⇅</div>
+            </div>
+
+            <div class="route-input-container">
+                <div class="icon-label-wrapper">
+                    <span class="icon">🗺️</span>
+                    <div class="input-label-group">
+                        <label for="destinationInput">@Localizer["DestinationLabel"]</label>
+                        <input type="text" id="destinationInput" name="DestinationName" list="destinationList"
+                               value="@Model.DestinationName" autocomplete="off" required />
+                        <input type="hidden" id="DestinationId" name="DestinationId" value="@Model.DestinationId" />
+                        <datalist id="destinationList">
+                            @foreach (var loc in Model.Locations)
+                            {
+                                <option value="@loc.Text" data-id="@loc.Value"></option>
+                            }
+                        </datalist>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="height: 24px;"></div>
+    
+    <div id="locationError" class="validation-message" style="display:none;">
+        @Localizer["OriginDestinationCannotBeSame"]
+    </div>
+
+    <div class="form-group date-picker-group">
+        <div class="datepicker-container">
+            <span class="calendar-icon">📅</span>
+
+            <label for="departureDateInput" class="floating-label">@Localizer["DepartureDateLabel"]</label>
+            <input type="text" id="departureDateInput" name="DepartureDate"
+                   class="form-control with-icon" value="@(Model.DepartureDate?.ToString("dd MMMM yyyy"))" required />
+
+            <div class="date-shortcuts-inside">
+                <button type="button" id="btnToday" onclick="setToday()">@Localizer["Today"]</button>
+                <button type="button" id="btnTomorrow" onclick="setTomorrow()">@Localizer["Tomorrow"]</button>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="submit-button">@Localizer["SubmitButton"]</button>
+</form>
+
+<script>
+    flatpickr("#departureDateInput", {
+        dateFormat: "d F Y", 
+        locale: "tr",
+        minDate: "today"
+    });
+
+    document.getElementById('swapButton').addEventListener('click', function () {
+        const origin = document.getElementById('originInput');
+        const originId = document.getElementById('OriginId');
+        const dest = document.getElementById('destinationInput');
+        const destId = document.getElementById('DestinationId');
+
+        [origin.value, dest.value] = [dest.value, origin.value];
+        [originId.value, destId.value] = [destId.value, originId.value];
+    });
+
+    function setToday() {
+        const today = new Date();
+        document.getElementById('departureDateInput')._flatpickr.setDate(today);
+        updateActiveButton("btnToday");
+    }
+
+    function setTomorrow() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('departureDateInput')._flatpickr.setDate(tomorrow);
+        updateActiveButton("btnTomorrow");
+    }
+
+    function updateActiveButton(activeId) {
+        document.querySelectorAll(".date-shortcuts button").forEach(btn => {
+            btn.classList.remove("active");
+        });
+        document.getElementById(activeId).classList.add("active");
+    }
+    
+    document.getElementById('originInput').addEventListener('change', function () {
+        const value = this.value;
+        const match = [...document.getElementById('originList').options]
+            .find(opt => opt.value === value);
+        document.getElementById('OriginId').value = match ? match.dataset.id : '';
+    });
+
+    document.getElementById('destinationInput').addEventListener('change', function () {
+        const value = this.value;
+        const match = [...document.getElementById('destinationList').options]
+            .find(opt => opt.value === value);
+        document.getElementById('DestinationId').value = match ? match.dataset.id : '';
+    });
+
+    document.querySelector('.submit-button').addEventListener('click', function (e) {
+        const originId = document.getElementById('OriginId').value;
+        const destinationId = document.getElementById('DestinationId').value;
+        const errorDiv = document.getElementById('locationError');
+
+        if (originId && destinationId && originId === destinationId) {
+            e.preventDefault();
+            errorDiv.style.display = 'block';
+        } else {
+            errorDiv.style.display = 'none';
+        }
+    });
+</script>
+
+<style>
+    .form {
+        max-width: 400px;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .form-control {
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: 10px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .submit-button {
+        background-color: #003366;
+        color: white;
+    }
+
+    .date-picker-group {
+        width: 100%;
+    }
+
+    .datepicker-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 64px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 0 12px;
+        background-color: #fff;
+    }
+
+    .floating-label {
+        position: absolute;
+        top: 6px;
+        left: 36px;
+        font-size: 0.75rem;
+        color: #555;
+        background-color: white;
+        padding: 0 4px;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .form-control.with-icon {
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        width: 100%;
+        padding-left: 36px; 
+        padding-right: 85px; 
+        height: 100%;
+        background-color: transparent;
+        box-sizing: border-box;
+    }
+
+    .calendar-icon {
+        position: absolute;
+        left: 12px;
+        font-size: 1.2rem;
+        color: #888;
+        pointer-events: none;
+    }
+
+    .date-shortcuts-inside {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .date-shortcuts-inside button {
+        background-color: #f1f1f1;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .date-shortcuts-inside button.active {
+        background-color: #ccc;
+        font-weight: bold;
+    }
+
+    .floating-input-wrapper input {
+        flex: 1;
+        padding: 14px 12px 14px 12px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .date-shortcuts button {
+        background-color: #f1f1f1;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .quick-select button {
+        background-color: #f1f1f1;
+        border: none;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .quick-select button {
+        background-color: #ccc;
+        font-weight: bold;
+    }
+    
+    .validation-message {
+        color: #dc3545; 
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+
+    label {
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .route-group {
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .route-pair {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        position: relative;
+    }
+
+    .route-input-container {
+        width: 100%;
+    }
+
+    .icon-label-wrapper {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 8px 12px;
+        background: #fff;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .icon {
+        font-size: 1.2rem;
+        color: #007bff;
+    }
+
+    .input-label-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .input-label-group label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 2px;
+        margin-top: 2px;
+    }
+
+    .input-label-group input {
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        padding: 4px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .swap-icon-wrapper {
+        position: absolute;
+        top: 50%;
+        right: 12px; 
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+    
+    .swap-icon {
+        background-color: #003366;;
+        color: white;
+        font-size: 1rem;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .form,
+    .route-group,
+    .form-group {
+        max-width: 400px;
+        width: 100%;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .route-input-container,
+    .icon-label-wrapper {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+
+
+    .journey-banner {
+        background-color: #003366;
+        color: white;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+        text-align: center;
+    }
+
+    .journey-header {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .back-button {
+        position: absolute;
+        left: 0;
+        color: white;
+        text-decoration: none;
+        font-size: 1.5rem;
+        font-weight: bold;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    .journey-info {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #fff;
+    }
+
+    .journey-date {
+        font-weight: 400;
+        font-size: 1rem;
+        color: #e0e0e0;
+        margin-top: 6px;
+    }
+</style>

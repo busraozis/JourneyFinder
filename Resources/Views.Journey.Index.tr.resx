@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="Title" xml:space="preserve">
+    <value>Otobüs Yolculuğu Planlayıcı</value>
+  </data>
+  <data name="PageHeading" xml:space="preserve">
+    <value>Bulunan Yolculuklar</value>
+  </data>
+    <data name="OriginLabel" xml:space="preserve">
+    <value>Nereden</value>
+  </data>
+  <data name="DestinationLabel" xml:space="preserve">
+    <value>Nereye</value>
+  </data>
+  <data name="ArrivalLabel" xml:space="preserve">
+    <value>Varış</value>
+  </data>
+  <data name="DepartureLabel" xml:space="preserve">
+    <value>Kalkış</value>
+  </data>
+  <data name="PriceLabel" xml:space="preserve">
+    <value>Fiyat</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Yolculuk bulunamadı.</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Geri</value>
+  </data>
+</root>

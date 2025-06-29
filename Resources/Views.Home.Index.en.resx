@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="Title" xml:space="preserve">
+    <value>Bus Journey Planner</value>
+  </data>
+    <data name="PageHeading" xml:space="preserve">
+    <value>Plan Your Journey</value>
+  </data>
+    <data name="OriginLabel" xml:space="preserve">
+    <value>From</value>
+  </data>
+    <data name="DestinationLabel" xml:space="preserve">
+    <value>To</value>
+  </data>
+    <data name="SelectOption" xml:space="preserve">
+    <value>Select</value>
+  </data>
+    <data name="SwapButton" xml:space="preserve">
+    <value>Swap</value>
+  </data>
+    <data name="DepartureDateLabel" xml:space="preserve">
+    <value>Date</value>
+  </data>
+    <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+    <data name="Tomorrow" xml:space="preserve">
+    <value>Tomorrow</value>
+  </data>
+  <data name="SubmitButton" xml:space="preserve">
+    <value>Find Your Ticket</value>
+  </data>
+  <data name="InvalidDestination" xml:space="preserve">
+    <value>Invalid Destination</value>
+  </data>
+  <data name="InvalidOrigin" xml:space="preserve">
+    <value>Invalid Origin</value>
+  </data>
+  <data name="OriginDestinationCannotBeSame" xml:space="preserve">
+    <value>Arrival and departure points cannot be the same</value>
+  </data>
+</root>

@@ -1,0 +1,184 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model JourneyFinder.Models.ViewModels.JourneyIndexViewModel
+
+@{
+    ViewData["Title"] = Localizer["Title"];
+    var originName = Model.OriginName;
+    var destinationName = Model.DestinationName;
+    var formattedDate = Model.SearchDate.ToString("dd MMMM, dddd", new System.Globalization.CultureInfo("tr-TR"));
+}
+
+<div class="journey-banner">
+    <div class="journey-header">
+        <a asp-controller="Home" asp-action="Index" class="back-button">←</a>
+        <div class="journey-info">
+            <span>@originName</span>
+            <span class="dash">-</span>
+            <span>@destinationName</span>
+        </div>
+    </div>
+    <div class="journey-date">@formattedDate</div>
+</div>
+
+@if (Model.Journeys.Any())
+{
+    <div class="journey-list">
+        @foreach (var journey in Model.Journeys)
+        {
+            <div class="journey-box">
+                <div class="time-price-row">
+                    <div class="time">
+                        <div class="time-labels">
+                            <span class="time-label">@Localizer["DepartureLabel"]</span>
+                            <span class="time-label">@Localizer["ArrivalLabel"]</span>
+                        </div>
+                        <div class="time-values">
+                            <span class="time-value">@journey.Journey.Departure.ToString("HH:mm")</span>
+                            <span class="time-arrow">→</span>
+                            <span class="time-value">@journey.Journey.Arrival.ToString("HH:mm")</span>
+                        </div>
+                    </div>
+                    <div class="price-badge">@($"{journey.Journey.OriginalPrice:N2} ₺")</div>
+                </div>
+                <div class="locations">
+                    @journey.Journey.Origin - @journey.Journey.Destination
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>@Localizer["NotFound"]</p>
+}
+
+
+<style>
+    .journey-banner {
+        background-color: #003366;
+        color: white;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+        text-align: center;
+    }
+
+    .journey-header {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .back-button {
+        position: absolute;
+        left: 0;
+        color: white;
+        text-decoration: none;
+        font-size: 1.5rem;
+        font-weight: bold;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    .journey-info {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #fff;
+    }
+
+    .journey-date {
+        font-weight: 400;
+        font-size: 1rem;
+        color: #e0e0e0;
+        margin-top: 6px;
+    }
+
+    .journey-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 8px;
+    }
+
+    .journey-box {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        background-color: #f8f9fa;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .time-price-row {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .time-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #003366;
+        margin-bottom: 4px;
+    }
+
+    .time-values {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #003366;
+    }
+
+    .time-value {
+        flex: 1;
+        text-align: center;
+    }
+
+    .time-arrow {
+        padding: 0 6px;
+        font-weight: bold;
+        color: #003366;
+    }
+
+
+    .time-price-row .time,
+    .time-price-row {
+        font-weight: 500;
+        font-size: 1.05rem;
+    }
+
+    .locations {
+        font-size: 0.95rem;
+        font-weight: 400;
+        color: #666;
+    }
+
+    .price-badge {
+        background-color: #dc3545;
+        color: white;
+        padding: 6px 0;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1rem;
+        width: 90px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    label {
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+</style>
