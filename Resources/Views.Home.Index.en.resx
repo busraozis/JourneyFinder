@@ -37,6 +37,6 @@
     <value>Invalid Origin</value>
   </data>
   <data name="OriginDestinationCannotBeSame" xml:space="preserve">
-    <value>Arrival and departure points cannot be the same</value>
+    <value>Arrival and departure points cannot be the same.</value>
   </data>
 </root>

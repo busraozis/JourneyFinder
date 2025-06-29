@@ -18,15 +18,10 @@
                     <span class="icon">🗺️</span>
                     <div class="input-label-group">
                         <label for="originInput">@Localizer["OriginLabel"]</label>
-                        <input type="text" id="originInput" name="OriginName" list="originList"
+                        <input type="text" id="originInput" name="OriginName"
                                value="@Model.OriginName" autocomplete="off" required />
                         <input type="hidden" id="OriginId" name="OriginId" value="@Model.OriginId" />
-                        <datalist id="originList">
-                            @foreach (var loc in Model.Locations)
-                            {
-                                <option value="@loc.Text" data-id="@loc.Value"></option>
-                            }
-                        </datalist>
+                        <ul id="originDropdown" class="custom-dropdown" style="display:none;"></ul>
                     </div>
                 </div>
             </div>
@@ -40,27 +35,21 @@
                     <span class="icon">🗺️</span>
                     <div class="input-label-group">
                         <label for="destinationInput">@Localizer["DestinationLabel"]</label>
-                        <input type="text" id="destinationInput" name="DestinationName" list="destinationList"
+                        <input type="text" id="destinationInput" name="DestinationName"
                                value="@Model.DestinationName" autocomplete="off" required />
                         <input type="hidden" id="DestinationId" name="DestinationId" value="@Model.DestinationId" />
-                        <datalist id="destinationList">
-                            @foreach (var loc in Model.Locations)
-                            {
-                                <option value="@loc.Text" data-id="@loc.Value"></option>
-                            }
-                        </datalist>
-
+                        <ul id="destinationDropdown" class="custom-dropdown" style="display:none;"></ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <div style="height: 24px;"></div>
-    
     <div id="locationError" class="validation-message" style="display:none;">
         @Localizer["OriginDestinationCannotBeSame"]
     </div>
+    
+    <div style="height: 24px;"></div>
 
     <div class="form-group date-picker-group">
         <div class="datepicker-container">
@@ -81,67 +70,166 @@
 </form>
 
 <script>
-    flatpickr("#departureDateInput", {
-        dateFormat: "d F Y", 
-        locale: "tr",
-        minDate: "today"
-    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const departureInput = document.getElementById("departureDateInput");
+        const btnToday = document.getElementById("btnToday");
+        const btnTomorrow = document.getElementById("btnTomorrow");
 
-    document.getElementById('swapButton').addEventListener('click', function () {
-        const origin = document.getElementById('originInput');
-        const originId = document.getElementById('OriginId');
-        const dest = document.getElementById('destinationInput');
-        const destId = document.getElementById('DestinationId');
-
-        [origin.value, dest.value] = [dest.value, origin.value];
-        [originId.value, destId.value] = [destId.value, originId.value];
-    });
-
-    function setToday() {
-        const today = new Date();
-        document.getElementById('departureDateInput')._flatpickr.setDate(today);
-        updateActiveButton("btnToday");
-    }
-
-    function setTomorrow() {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('departureDateInput')._flatpickr.setDate(tomorrow);
-        updateActiveButton("btnTomorrow");
-    }
-
-    function updateActiveButton(activeId) {
-        document.querySelectorAll(".date-shortcuts button").forEach(btn => {
-            btn.classList.remove("active");
+        const fp = flatpickr(departureInput, {
+            dateFormat: "d F Y",
+            locale: "tr",
+            minDate: "today",
+            defaultDate: departureInput.value || "today",
+            onChange: updateTodayTomorrowButtons
         });
-        document.getElementById(activeId).classList.add("active");
-    }
-    
-    document.getElementById('originInput').addEventListener('change', function () {
-        const value = this.value;
-        const match = [...document.getElementById('originList').options]
-            .find(opt => opt.value === value);
-        document.getElementById('OriginId').value = match ? match.dataset.id : '';
-    });
 
-    document.getElementById('destinationInput').addEventListener('change', function () {
-        const value = this.value;
-        const match = [...document.getElementById('destinationList').options]
-            .find(opt => opt.value === value);
-        document.getElementById('DestinationId').value = match ? match.dataset.id : '';
-    });
+        btnToday.addEventListener("click", function () {
+            const today = new Date();
+            fp.setDate(today);
+            updateActiveButton("btnToday");
+        });
 
-    document.querySelector('.submit-button').addEventListener('click', function (e) {
-        const originId = document.getElementById('OriginId').value;
-        const destinationId = document.getElementById('DestinationId').value;
-        const errorDiv = document.getElementById('locationError');
+        btnTomorrow.addEventListener("click", function () {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            fp.setDate(tomorrow);
+            updateActiveButton("btnTomorrow");
+        });
 
-        if (originId && destinationId && originId === destinationId) {
-            e.preventDefault();
-            errorDiv.style.display = 'block';
-        } else {
-            errorDiv.style.display = 'none';
+        function updateTodayTomorrowButtons(selectedDates) {
+            const selected = selectedDates[0];
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+
+            const isToday = selected.toDateString() === today.toDateString();
+            const isTomorrow = selected.toDateString() === tomorrow.toDateString();
+
+            if (isToday) updateActiveButton("btnToday");
+            else if (isTomorrow) updateActiveButton("btnTomorrow");
+            else updateActiveButton(null);
         }
+
+        function updateActiveButton(activeId) {
+            [btnToday, btnTomorrow].forEach(btn => btn.classList.remove("active"));
+            if (activeId) document.getElementById(activeId).classList.add("active");
+        }
+
+        document.getElementById("swapButton").addEventListener("click", function () {
+            const origin = document.getElementById("originInput");
+            const originId = document.getElementById("OriginId");
+            const dest = document.getElementById("destinationInput");
+            const destId = document.getElementById("DestinationId");
+
+            [origin.value, dest.value] = [dest.value, origin.value];
+            [originId.value, destId.value] = [destId.value, originId.value];
+        });
+
+        document.querySelector(".submit-button").addEventListener("click", function (e) {
+            const originId = document.getElementById("OriginId").value;
+            const destinationId = document.getElementById("DestinationId").value;
+            const errorDiv = document.getElementById("locationError");
+
+            if (originId && destinationId && originId === destinationId) {
+                e.preventDefault();
+                errorDiv.style.display = "block";
+            } else {
+                errorDiv.style.display = "none";
+            }
+        });
+
+        if (departureInput.value) {
+            const parsed = fp.parseDate(departureInput.value, "d F Y");
+            if (parsed) updateTodayTomorrowButtons([parsed]);
+        }
+
+        const originInput = document.getElementById("originInput");
+        const originIdInput = document.getElementById("OriginId");
+        const originDropdown = document.getElementById("originDropdown");
+
+        const destinationInput = document.getElementById("destinationInput");
+        const destinationIdInput = document.getElementById("DestinationId");
+        const destinationDropdown = document.getElementById("destinationDropdown");
+
+        const locations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Locations));
+
+        function setupDropdown(inputEl, hiddenIdEl, dropdownEl) {
+            let currentIndex = -1;
+
+            inputEl.addEventListener("input", function () {
+                const query = this.value.toLowerCase();
+                dropdownEl.innerHTML = "";
+                currentIndex = -1;
+
+                if (!query) {
+                    dropdownEl.style.display = "none";
+                    return;
+                }
+
+                const filtered = locations.filter(loc => loc.Text.toLowerCase().includes(query));
+                if (filtered.length === 0) {
+                    dropdownEl.style.display = "none";
+                    return;
+                }
+
+                filtered.forEach((loc, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = loc.Text;
+                    li.dataset.id = loc.Value;
+                    li.setAttribute("data-index", i);
+                    li.addEventListener("click", function () {
+                        inputEl.value = loc.Text;
+                        hiddenIdEl.value = loc.Value;
+                        dropdownEl.innerHTML = "";
+                        dropdownEl.style.display = "none";
+                    });
+                    dropdownEl.appendChild(li);
+                });
+
+                dropdownEl.style.display = "block";
+            });
+
+            inputEl.addEventListener("keydown", function (e) {
+                const items = dropdownEl.querySelectorAll("li");
+                if (dropdownEl.style.display !== "block" || items.length === 0) return;
+
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    currentIndex = (currentIndex + 1) % items.length;
+                    updateActiveItem(items);
+                } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    currentIndex = (currentIndex - 1 + items.length) % items.length;
+                    updateActiveItem(items);
+                } else if (e.key === "Enter") {
+                    if (currentIndex >= 0 && items[currentIndex]) {
+                        e.preventDefault();
+                        items[currentIndex].click();
+                    }
+                }
+            });
+
+            function updateActiveItem(items) {
+                items.forEach((item, idx) => {
+                    if (idx === currentIndex) {
+                        item.classList.add("active");
+                        item.scrollIntoView({ block: "nearest" });
+                    } else {
+                        item.classList.remove("active");
+                    }
+                });
+            }
+
+
+            document.addEventListener("click", function (e) {
+                if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
+                    dropdownEl.style.display = "none";
+                }
+            });
+        }
+
+        setupDropdown(originInput, originIdInput, originDropdown);
+        setupDropdown(destinationInput, destinationIdInput, destinationDropdown);
     });
 </script>
 
@@ -400,6 +488,46 @@
         width: 100%;
         box-sizing: border-box;
     }
+
+    .input-label-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        position: relative; 
+    }
+
+    .custom-dropdown {
+        position: absolute;
+        top: 100%; 
+        left: 0;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 2px;
+        max-height: 180px;
+        overflow-y: auto;
+        list-style: none;
+        padding: 0;
+        z-index: 999;
+        width: 100%; 
+        box-sizing: border-box;
+    }
+
+
+    .custom-dropdown li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+    .custom-dropdown li.active {
+        background-color: #e0e0e0;
+        font-weight: bold;
+    }
+
+    .custom-dropdown li:hover {
+        background-color: #f0f0f0;
+    }
+
 
 
 

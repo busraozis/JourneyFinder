@@ -37,6 +37,6 @@
     <value>Kalkış noktası geçersiz</value>
   </data>
   <data name="OriginDestinationCannotBeSame" xml:space="preserve">
-    <value>Varış ve kalkış noktaları aynı olamaz</value>
+    <value>Varış ve kalkış noktaları aynı olamaz.</value>
   </data>
 </root>
