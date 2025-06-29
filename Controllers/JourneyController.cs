@@ -1,22 +1,19 @@
+using JourneyFinder.Dtos;
 using JourneyFinder.Filters;
-using JourneyFinder.Models.Requests;
+using JourneyFinder.Managers.Interfaces;
 using JourneyFinder.Models.Responses;
 using JourneyFinder.Models.ViewModels;
-using JourneyFinder.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace JourneyFinder.Controllers;
 
 public class JourneyController : BaseController
 {
-    private readonly IJourneyService _journeyService;
-    private readonly IDistributedCache _cache;
+    private readonly IJourneyManager _journeyManager;
 
-    public JourneyController(IJourneyService journeyService, IDistributedCache cache)
+    public JourneyController(IJourneyManager journeyManager)
     {
-        _journeyService = journeyService;
-        _cache = cache;
+        _journeyManager = journeyManager;
     }
 
     [ServiceFilter(typeof(JourneyValidationFilter))]
@@ -28,37 +25,18 @@ public class JourneyController : BaseController
 
         if (string.IsNullOrEmpty(sessionId) || string.IsNullOrEmpty(deviceId))
         {
-            return StatusCode(400, "Session bilgileri eksik");
+            return StatusCode(400, "Missing session info");
         }
-        
-        var request = new BaseRequest<JourneyRequest>
+
+        var dto = new JourneyDto
         {
-            DeviceSession = new DeviceSession
-            {
-                SessionId = sessionId,
-                DeviceId = deviceId
-            },
-            Date = DateTime.UtcNow.ToShortDateString(),
-            Language = UserLanguage,
-            Data = new JourneyRequest
-            {
-                OriginId = originId,
-                DestinationId = destinationId,
-                DepartureDate = departureDate
-            }
+            OriginId = originId,
+            DestinationId = destinationId,
+            DepartureDate = departureDate,
+            Language = UserLanguage
         };
 
-        var journeys = await _journeyService.GetBusJourneysAsync(request);
-
-        var searchKey = $"session:{sessionId}:{deviceId}:lastSearch";
-        var searchValue = $"{originId}|{destinationId}|{departureDate:yyyy-MM-dd}";
-
-        var cacheOptions = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30)
-        };
-
-        await _cache.SetStringAsync(searchKey, searchValue, cacheOptions);
+        var journeys = await _journeyManager.GetJourneysAsync(sessionId, deviceId, dto);
         
         var vm = new JourneyIndexViewModel
         {

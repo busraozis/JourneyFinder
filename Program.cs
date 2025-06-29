@@ -1,9 +1,13 @@
 using System.Net;
-using FluentValidation.AspNetCore;
+using JourneyFinder.Factories;
 using JourneyFinder.Filters;
+using JourneyFinder.Helpers;
+using JourneyFinder.Managers;
+using JourneyFinder.Managers.Interfaces;
 using JourneyFinder.Options;
 using JourneyFinder.Services;
 using JourneyFinder.Services.Interfaces;
+using JourneyFinder.Settings;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Options;
@@ -14,6 +18,13 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IBusLocationService, BusLocationService>();
 builder.Services.AddScoped<IJourneyService, JourneyService>();
+builder.Services.AddScoped<ISessionManager, SessionManager>();
+builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+builder.Services.AddScoped<IJourneyManager, JourneyManager>();
+builder.Services.AddScoped<ICookieManager, CookieManager>();
+builder.Services.AddScoped<IRequestContextHelper, RequestContextHelper>();
+builder.Services.AddScoped<IDeviceRequestFactory, DeviceRequestFactory>();
+
 builder.Services.AddScoped<JourneyValidationFilter>();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -39,6 +50,8 @@ builder.Services.AddSession(options =>
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.Configure<ObiletApiOptions>(
     builder.Configuration.GetSection("ObiletApi"));
+builder.Services.Configure<CookieSettings>(builder.Configuration.GetSection("CookieSettings"));
+
 builder.Services.AddControllersWithViews(o =>
     {
         o.Filters.Add<PersistentCookieActionFilter>();
