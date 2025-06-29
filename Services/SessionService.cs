@@ -9,25 +9,20 @@ using Microsoft.Extensions.Options;
 
 namespace JourneyFinder.Services;
 
-public class SessionService : ISessionService
+public class SessionService(
+    IHttpClientFactory httpClientFactory,
+    IConfiguration configuration,
+    IOptions<ObiletApiOptions> apiOptions)
+    : ISessionService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IConfiguration _configuration;
-    private readonly ObiletApiOptions _apiOptions;
+    private readonly ObiletApiOptions _apiOptions = apiOptions.Value;
 
-    public SessionService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IOptions<ObiletApiOptions> apiOptions)
-    {
-        _httpClientFactory = httpClientFactory;
-        _configuration = configuration;
-        _apiOptions = apiOptions.Value;
-    }
-    
     public async Task<SessionResponse?> GetSessionAsync(DistribusionDeviceRequest request)
     {
-        var client = _httpClientFactory.CreateClient();
+        var client = httpClientFactory.CreateClient();
         client.BaseAddress = new Uri(_apiOptions.BaseUrl);
 
-        var apiClientToken = _configuration["ObiletApiKey"];
+        var apiClientToken = configuration["ObiletApiKey"];
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiClientToken);
 
         var json = JsonSerializer.Serialize(request);

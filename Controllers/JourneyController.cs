@@ -1,20 +1,14 @@
+using JourneyFinder.Builders;
 using JourneyFinder.Dtos;
 using JourneyFinder.Filters;
 using JourneyFinder.Managers.Interfaces;
-using JourneyFinder.Models.Responses;
-using JourneyFinder.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JourneyFinder.Controllers;
 
-public class JourneyController : BaseController
+public class JourneyController(IJourneyManager journeyManager, IJourneyViewModelBuilder journeyViewModelBuilder)
+    : BaseController
 {
-    private readonly IJourneyManager _journeyManager;
-
-    public JourneyController(IJourneyManager journeyManager)
-    {
-        _journeyManager = journeyManager;
-    }
 
     [ServiceFilter(typeof(JourneyValidationFilter))]
     [HttpPost]
@@ -36,15 +30,8 @@ public class JourneyController : BaseController
             Language = UserLanguage
         };
 
-        var journeys = await _journeyManager.GetJourneysAsync(sessionId, deviceId, dto);
-        
-        var vm = new JourneyIndexViewModel
-        {
-            OriginName = originName,
-            DestinationName = destinationName,
-            SearchDate = departureDate,
-            Journeys = new List<BusJourneyResponse>(journeys.Where(j => j.Journey.Departure.Date == departureDate.Date).OrderBy(j  => j.Journey.Departure))
-        };
+        var journeys = await journeyManager.GetJourneysAsync(sessionId, deviceId, dto);
+        var vm = journeyViewModelBuilder.Build(originName, destinationName, departureDate, journeys);
 
         return View(vm);
     }

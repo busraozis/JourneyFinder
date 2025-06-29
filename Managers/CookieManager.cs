@@ -4,14 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace JourneyFinder.Managers;
 
-public class CookieManager :  ICookieManager
+public class CookieManager(IOptions<CookieSettings> settings) : ICookieManager
 {
-    private readonly CookieSettings _cookieSettings;
-
-    public CookieManager(IOptions<CookieSettings> settings)
-    {
-        _cookieSettings = settings.Value;
-    }
+    private readonly CookieSettings _cookieSettings = settings.Value;
 
     public void WriteSessionCookies(HttpContext context, string sessionId, string deviceId, TimeSpan duration)
     {

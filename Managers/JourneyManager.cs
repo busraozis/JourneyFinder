@@ -7,17 +7,8 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace JourneyFinder.Managers;
 
-public class JourneyManager : IJourneyManager
+public class JourneyManager(IJourneyService journeyService, IDistributedCache cache) : IJourneyManager
 {
-    private readonly IJourneyService _journeyService;
-    private readonly IDistributedCache _cache;
-
-    public JourneyManager(IJourneyService journeyService, IDistributedCache cache)
-    {
-        _journeyService = journeyService;
-        _cache = cache;
-    }
-
     public async Task<IEnumerable<BusJourneyResponse>> GetJourneysAsync(string sessionId, string deviceId, JourneyDto dto)
     {
         var request = new BaseRequest<JourneyRequest>
@@ -37,12 +28,12 @@ public class JourneyManager : IJourneyManager
             }
         };
 
-        var journeys = await _journeyService.GetBusJourneysAsync(request);
+        var journeys = await journeyService.GetBusJourneysAsync(request);
 
         var searchKey = $"session:{sessionId}:{deviceId}:lastSearch";
         var searchValue = $"{dto.OriginId}|{dto.DestinationId}|{dto.DepartureDate:yyyy-MM-dd}";
 
-        await _cache.SetStringAsync(searchKey, searchValue, new DistributedCacheEntryOptions
+        await cache.SetStringAsync(searchKey, searchValue, new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30)
         });

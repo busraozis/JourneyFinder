@@ -1,4 +1,5 @@
 using System.Net;
+using JourneyFinder.Builders;
 using JourneyFinder.Factories;
 using JourneyFinder.Filters;
 using JourneyFinder.Helpers;
@@ -24,7 +25,9 @@ builder.Services.AddScoped<IJourneyManager, JourneyManager>();
 builder.Services.AddScoped<ICookieManager, CookieManager>();
 builder.Services.AddScoped<IRequestContextHelper, RequestContextHelper>();
 builder.Services.AddScoped<IDeviceRequestFactory, DeviceRequestFactory>();
-
+builder.Services.AddScoped<IBusLocationManager, BusLocationManager>();
+builder.Services.AddScoped<IHomeViewModelBuilder, HomeViewModelBuilder>();
+builder.Services.AddScoped<IJourneyViewModelBuilder, JourneyViewModelBuilder>();
 builder.Services.AddScoped<JourneyValidationFilter>();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {

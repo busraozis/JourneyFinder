@@ -1,59 +1,27 @@
+using JourneyFinder.Builders;
+using JourneyFinder.Managers;
 using JourneyFinder.Managers.Interfaces;
-using JourneyFinder.Models.Requests;
-using JourneyFinder.Models.ViewModels;
+using JourneyFinder.Models.Responses;
 using JourneyFinder.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace JourneyFinder.Controllers;
 
-public class HomeController : BaseController
+public class HomeController(
+    ISessionManager sessionManager,
+    IRedisCacheService redisCacheService,
+    IHomeViewModelBuilder viewModelBuilder,
+    IBusLocationManager busLocationManager)
+    : BaseController
 {
-    private readonly IBusLocationService _busLocationService;
-    private readonly ISessionManager _sessionManager;
-    private readonly IRedisCacheService _redisCacheService;
-
-    public HomeController(ISessionManager sessionManager, IBusLocationService busLocationService, IRedisCacheService redisCacheService)
-    {
-        _sessionManager = sessionManager;
-        _busLocationService = busLocationService;
-        _redisCacheService = redisCacheService;
-    }
-
     public async Task<IActionResult> Index()
     {
-        var (sessionId, deviceId) = await _sessionManager.GetOrCreateSessionAsync(HttpContext);
+        var (sessionId, deviceId) = await sessionManager.GetOrCreateSessionAsync(HttpContext);
+        var locations = await busLocationManager.GetLocationsAsync(sessionId, deviceId, UserLanguage);
+        var busLocationResponses = locations as BusLocationResponse[] ?? locations.ToArray();
+        var lastSearch = await redisCacheService.GetLastSearchAsync(sessionId, deviceId, busLocationResponses);
 
-        var baseRequest = new BaseRequest<BusLocationRequest>
-        {
-            DeviceSession = new DeviceSession
-            {
-                SessionId = sessionId,
-                DeviceId = deviceId
-            },
-            Date = DateTime.UtcNow.ToShortDateString(),
-            Data = null!, 
-            Language = UserLanguage
-        };
-
-        var locations = await _busLocationService.GetBusLocationsAsync(baseRequest);
-        var lastSearch = await _redisCacheService.GetLastSearchAsync(sessionId, deviceId, locations);
-
-
-        var model = new HomeIndexViewModel
-        {
-            Locations = locations.Select(loc => new SelectListItem
-            {
-                Text = loc.Name,
-                Value = loc.Id.ToString()
-            }).ToList(),
-            OriginId = lastSearch?.OriginId,
-            DestinationId = lastSearch?.DestinationId,
-            DepartureDate = lastSearch?.DepartureDate,
-            OriginName = lastSearch?.OriginName,
-            DestinationName = lastSearch?.DestinationName,
-        };
-
+        var model = viewModelBuilder.Build(busLocationResponses, lastSearch);
         return View(model);
     }
 }
