@@ -1,46 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const userLang = navigator.language || navigator.userLanguage;
-    const isTurkish = userLang.toLowerCase().startsWith("tr");
-
-    const locale = isTurkish ? flatpickr.l10ns.tr : flatpickr.l10ns.default;
-
     const departureInput = document.getElementById("departureDateInput");
     const btnToday = document.getElementById("btnToday");
     const btnTomorrow = document.getElementById("btnTomorrow");
-    const swapButton = document.getElementById("swapButton");
-    const submitButton = document.querySelector(".submit-button");
-    const locationError = document.getElementById("locationError");
 
-    const originInput = document.getElementById("originInput");
-    const originIdInput = document.getElementById("OriginId");
-    const originDropdown = document.getElementById("originDropdown");
-
-    const destinationInput = document.getElementById("destinationInput");
-    const destinationIdInput = document.getElementById("DestinationId");
-    const destinationDropdown = document.getElementById("destinationDropdown");
-
-    if (!window.locations) {
-        console.warn("locations değişkeni bulunamadı.");
-        return;
-    }
-
-    const defaultDate = departureInput.value || new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const defaultDate = departureInput.value
+        ? departureInput.value
+        : new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const fp = flatpickr(departureInput, {
         dateFormat: "d F Y",
-        locale: locale,
+        locale: window.currentFlatpickrLocale || "default",
         minDate: "today",
         defaultDate: defaultDate,
         onChange: updateTodayTomorrowButtons
     });
 
-    btnToday.addEventListener("click", () => {
+    btnToday.addEventListener("click", function () {
         const today = new Date();
         fp.setDate(today);
         updateActiveButton("btnToday");
     });
 
-    btnTomorrow.addEventListener("click", () => {
+    btnTomorrow.addEventListener("click", function () {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         fp.setDate(tomorrow);
@@ -53,8 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const tomorrow = new Date();
         tomorrow.setDate(today.getDate() + 1);
 
-        if (selected.toDateString() === today.toDateString()) updateActiveButton("btnToday");
-        else if (selected.toDateString() === tomorrow.toDateString()) updateActiveButton("btnTomorrow");
+        const isToday = selected.toDateString() === today.toDateString();
+        const isTomorrow = selected.toDateString() === tomorrow.toDateString();
+
+        if (isToday) updateActiveButton("btnToday");
+        else if (isTomorrow) updateActiveButton("btnTomorrow");
         else updateActiveButton(null);
     }
 
@@ -63,20 +47,26 @@ document.addEventListener("DOMContentLoaded", function () {
         if (activeId) document.getElementById(activeId).classList.add("active");
     }
 
-    swapButton.addEventListener("click", () => {
-        [originInput.value, destinationInput.value] = [destinationInput.value, originInput.value];
-        [originIdInput.value, destinationIdInput.value] = [destinationIdInput.value, originIdInput.value];
+    document.getElementById("swapButton").addEventListener("click", function () {
+        const origin = document.getElementById("originInput");
+        const originId = document.getElementById("OriginId");
+        const dest = document.getElementById("destinationInput");
+        const destId = document.getElementById("DestinationId");
+
+        [origin.value, dest.value] = [dest.value, origin.value];
+        [originId.value, destId.value] = [destId.value, originId.value];
     });
 
-    submitButton.addEventListener("click", function (e) {
-        const originId = originIdInput.value;
-        const destinationId = destinationIdInput.value;
+    document.querySelector(".submit-button").addEventListener("click", function (e) {
+        const originId = document.getElementById("OriginId").value;
+        const destinationId = document.getElementById("DestinationId").value;
+        const errorDiv = document.getElementById("locationError");
 
         if (originId && destinationId && originId === destinationId) {
             e.preventDefault();
-            locationError.style.display = "block";
+            errorDiv.style.display = "block";
         } else {
-            locationError.style.display = "none";
+            errorDiv.style.display = "none";
         }
     });
 
@@ -85,8 +75,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (parsed) updateTodayTomorrowButtons([parsed]);
     }
 
-    setupDropdown(originInput, originIdInput, originDropdown);
-    setupDropdown(destinationInput, destinationIdInput, destinationDropdown);
+    const originInput = document.getElementById("originInput");
+    const originIdInput = document.getElementById("OriginId");
+    const originDropdown = document.getElementById("originDropdown");
+
+    const destinationInput = document.getElementById("destinationInput");
+    const destinationIdInput = document.getElementById("DestinationId");
+    const destinationDropdown = document.getElementById("destinationDropdown");
 
     function setupDropdown(inputEl, hiddenIdEl, dropdownEl) {
         let currentIndex = -1;
@@ -96,15 +91,23 @@ document.addEventListener("DOMContentLoaded", function () {
             dropdownEl.innerHTML = "";
             currentIndex = -1;
 
-            const filtered = window.locations.filter(loc => loc.Text.toLowerCase().includes(query));
-            if (!filtered.length) return dropdownEl.style.display = "none";
+            if (!query) {
+                dropdownEl.style.display = "none";
+                return;
+            }
+
+            const filtered = locations.filter(loc => loc.Text.toLowerCase().includes(query));
+            if (filtered.length === 0) {
+                dropdownEl.style.display = "none";
+                return;
+            }
 
             filtered.forEach((loc, i) => {
                 const li = document.createElement("li");
                 li.textContent = loc.Text;
                 li.dataset.id = loc.Value;
                 li.setAttribute("data-index", i);
-                li.addEventListener("click", () => {
+                li.addEventListener("click", function () {
                     inputEl.value = loc.Text;
                     hiddenIdEl.value = loc.Value;
                     dropdownEl.innerHTML = "";
@@ -118,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         inputEl.addEventListener("keydown", function (e) {
             const items = dropdownEl.querySelectorAll("li");
-            if (dropdownEl.style.display !== "block" || !items.length) return;
+            if (dropdownEl.style.display !== "block" || items.length === 0) return;
 
             if (e.key === "ArrowDown") {
                 e.preventDefault();
@@ -128,23 +131,33 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.preventDefault();
                 currentIndex = (currentIndex - 1 + items.length) % items.length;
                 updateActiveItem(items);
-            } else if (e.key === "Enter" && currentIndex >= 0) {
-                e.preventDefault();
-                items[currentIndex].click();
+            } else if (e.key === "Enter") {
+                if (currentIndex >= 0 && items[currentIndex]) {
+                    e.preventDefault();
+                    items[currentIndex].click();
+                }
             }
         });
+
+        function updateActiveItem(items) {
+            items.forEach((item, idx) => {
+                if (idx === currentIndex) {
+                    item.classList.add("active");
+                    item.scrollIntoView({ block: "nearest" });
+                } else {
+                    item.classList.remove("active");
+                }
+            });
+        }
+
 
         document.addEventListener("click", function (e) {
             if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
                 dropdownEl.style.display = "none";
             }
         });
-
-        function updateActiveItem(items) {
-            items.forEach((item, idx) => {
-                item.classList.toggle("active", idx === currentIndex);
-                if (idx === currentIndex) item.scrollIntoView({ block: "nearest" });
-            });
-        }
     }
+
+    setupDropdown(originInput, originIdInput, originDropdown);
+    setupDropdown(destinationInput, destinationIdInput, destinationDropdown);
 });
