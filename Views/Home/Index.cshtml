@@ -2,14 +2,6 @@
 @inject IViewLocalizer Localizer
 @model JourneyFinder.Models.ViewModels.HomeIndexViewModel
 
-<div class="journey-banner">
-    <div class="journey-header">
-        <a class="back-button" style="visibility: hidden;">←</a>
-        <div class="journey-info">&nbsp;</div>
-    </div>
-    <div class="journey-date">&nbsp;</div>
-</div>
-
 <form asp-controller="Journey" asp-action="Index" method="post" class="journey-form">
     <div class="route-group">
         <div class="route-pair">

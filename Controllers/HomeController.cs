@@ -22,6 +22,8 @@ public class HomeController(
         var lastSearch = await redisCacheService.GetLastSearchAsync(sessionId, deviceId, busLocationResponses);
 
         var model = viewModelBuilder.Build(busLocationResponses, lastSearch);
+        
+        ViewData["ShowJourneyInfo"] = false;
         return View(model);
     }
 }

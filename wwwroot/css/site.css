@@ -29,3 +29,56 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.journey-banner {
+  background-color: #003366;
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.journey-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px; /* sabit yükseklik */
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  color: white;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.back-button.invisible {
+  visibility: hidden;
+}
+
+.journey-info {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #fff;
+  line-height: 1;
+  min-height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.journey-date {
+  font-weight: 400;
+  font-size: 1rem;
+  color: #e0e0e0;
+  margin-top: 6px;
+}
+

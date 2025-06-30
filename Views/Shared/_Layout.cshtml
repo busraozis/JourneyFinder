@@ -27,6 +27,27 @@
 <header>
 </header>
 <main>
+    <div class="journey-banner">
+        <div class="journey-header">
+            <a asp-controller="Home" asp-action="Index"
+               class="back-button @(ViewData["ShowJourneyInfo"] as bool? != true ? "invisible" : "")">←</a>
+
+            <div class="journey-info">
+                @if (ViewData["ShowJourneyInfo"] as bool? == true)
+                {
+                    <span>@ViewData["OriginName"]</span>
+                    <span class="dash">-</span>
+                    <span>@ViewData["DestinationName"]</span>
+                }
+                else
+                {
+                    <span>&nbsp;</span>
+                }
+            </div>
+        </div>
+        <div class="journey-date">@ViewData["FormattedDate"]</div>
+    </div>
+
     @RenderBody()
 </main>
 <footer>

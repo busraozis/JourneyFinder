@@ -1,3 +1,4 @@
+using System.Globalization;
 using JourneyFinder.Builders;
 using JourneyFinder.Dtos;
 using JourneyFinder.Filters;
@@ -32,6 +33,11 @@ public class JourneyController(IJourneyManager journeyManager, IJourneyViewModel
 
         var journeys = await journeyManager.GetJourneysAsync(sessionId, deviceId, dto);
         var vm = journeyViewModelBuilder.Build(originName, destinationName, departureDate, journeys);
+
+        ViewData["ShowJourneyInfo"] = true;
+        ViewData["OriginName"] = vm.OriginName;
+        ViewData["DestinationName"] = vm.DestinationName;
+        ViewData["FormattedDate"] = vm.SearchDate.ToString("dd MMMM, dddd", CultureInfo.CurrentUICulture);
 
         return View(vm);
     }

@@ -3,25 +3,6 @@
 @inject IViewLocalizer Localizer
 @model JourneyFinder.Models.ViewModels.JourneyIndexViewModel
 
-@{
-    ViewData["Title"] = Localizer["Title"];
-    var originName = Model.OriginName;
-    var destinationName = Model.DestinationName;
-    var formattedDate = Model.SearchDate.ToString("dd MMMM, dddd", CultureInfo.CurrentUICulture);
-}
-
-<div class="journey-banner">
-    <div class="journey-header">
-        <a asp-controller="Home" asp-action="Index" class="back-button">←</a>
-        <div class="journey-info">
-            <span>@originName</span>
-            <span class="dash">-</span>
-            <span>@destinationName</span>
-        </div>
-    </div>
-    <div class="journey-date">@formattedDate</div>
-</div>
-
 @if (Model.Journeys.Any())
 {
     <div class="journey-list">
