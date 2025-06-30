@@ -2,6 +2,7 @@ namespace JourneyFinder.Options;
 
 public class ObiletApiOptions
 {
+    public string ApiKey { get; set; }
     public string BaseUrl { get; set; }
     public EndpointsConfig Endpoints { get; set; }
 

@@ -11,7 +11,6 @@ namespace JourneyFinder.Services;
 
 public class BusLocationService(
     IHttpClientFactory httpClientFactory,
-    IConfiguration configuration,
     IOptions<ObiletApiOptions> apiOptions)
     : IBusLocationService
 {
@@ -22,7 +21,7 @@ public class BusLocationService(
             var client = httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_apiOptions.BaseUrl);
 
-            var apiClientToken = configuration["ObiletApiKey"];
+            var apiClientToken = _apiOptions.ApiKey;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiClientToken);
 
             var json = JsonSerializer.Serialize(request);

@@ -16,7 +16,8 @@ public class RequestContextHelper : IRequestContextHelper
 {
     public RequestContext ExtractRequestInfo(HttpContext context)
     {
-        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "";
+        var userAgent = context.Request.Headers["User-Agent"].FirstOrDefault() ?? "FakeUserAgent/1.0";
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";;
         var forwardedIp = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
         var ipAddress = !string.IsNullOrEmpty(forwardedIp) ? forwardedIp : ip;
 
@@ -24,7 +25,7 @@ public class RequestContextHelper : IRequestContextHelper
         {
             IpAddress = ipAddress,
             Port = context.Connection.RemotePort,
-            UserAgent = context.Request.Headers["User-Agent"].ToString()
+            UserAgent = userAgent
         };
     }
 }

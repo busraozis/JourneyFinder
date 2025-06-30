@@ -11,7 +11,6 @@ namespace JourneyFinder.Services;
 
 public class SessionService(
     IHttpClientFactory httpClientFactory,
-    IConfiguration configuration,
     IOptions<ObiletApiOptions> apiOptions)
     : ISessionService
 {
@@ -22,7 +21,7 @@ public class SessionService(
         var client = httpClientFactory.CreateClient();
         client.BaseAddress = new Uri(_apiOptions.BaseUrl);
 
-        var apiClientToken = configuration["ObiletApiKey"];
+        var apiClientToken = _apiOptions.ApiKey;
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiClientToken);
 
         var json = JsonSerializer.Serialize(request);
