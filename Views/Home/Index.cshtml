@@ -82,7 +82,7 @@
 
         const fp = flatpickr(departureInput, {
             dateFormat: "d F Y",
-            locale: "tr",
+            locale: window.currentFlatpickrLocale || "default",
             minDate: "today",
             defaultDate: defaultDate,
             onChange: updateTodayTomorrowButtons

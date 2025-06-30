@@ -1,3 +1,4 @@
+@using System.Globalization
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model JourneyFinder.Models.ViewModels.JourneyIndexViewModel
@@ -6,7 +7,7 @@
     ViewData["Title"] = Localizer["Title"];
     var originName = Model.OriginName;
     var destinationName = Model.DestinationName;
-    var formattedDate = Model.SearchDate.ToString("dd MMMM, dddd", new System.Globalization.CultureInfo("tr-TR"));
+    var formattedDate = Model.SearchDate.ToString("dd MMMM, dddd", CultureInfo.CurrentUICulture);
 }
 
 <div class="journey-banner">

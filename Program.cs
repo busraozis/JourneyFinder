@@ -40,13 +40,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
 app.UseForwardedHeaders();
-app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 app.MapStaticAssets();
 
 app.MapControllerRoute(

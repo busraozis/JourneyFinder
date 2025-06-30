@@ -11,6 +11,7 @@ using JourneyFinder.Services;
 using JourneyFinder.Services.Interfaces;
 using JourneyFinder.Settings;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 
 namespace JourneyFinder.Extensions;
 
@@ -69,9 +70,16 @@ public static class ServiceRegistrationExtensions
                 .Select(c => new CultureInfo(c))
                 .ToList();
 
-            options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("tr-TR");
+            options.DefaultRequestCulture = new RequestCulture("tr-TR");
             options.SupportedCultures = supportedCultures;
             options.SupportedUICultures = supportedCultures;
+            
+            options.RequestCultureProviders =
+            [
+                new CookieRequestCultureProvider(), 
+                new QueryStringRequestCultureProvider(),
+                new AcceptLanguageHeaderRequestCultureProvider()
+            ];
         });
 
         return services;
