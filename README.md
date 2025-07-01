@@ -7,7 +7,6 @@ JourneyFinder is a travel planning web application that allows users to search f
 ## ✨ Features
 
 - 🔍 Search journeys by departure, destination, and travel date  
-- 🚏 Auto-complete support for city names  
 - 🔐 Session management and Redis caching  
 - 🌍 Localization support (`tr-TR`, `en-EN`)  
 - 🧪 Health checks and Redis diagnostics  
