@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
 if (args.Contains("--docker"))
 {
     builder.WebHost.UseUrls("http://0.0.0.0:80");
@@ -47,12 +48,6 @@ builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrateg
 
 builder.Services.AddHealthChecks()
     .AddRedis(builder.Configuration.GetConnectionString("Redis") ?? string.Empty, name: "redis", failureStatus: HealthStatus.Degraded);
-
-builder.Services.Configure<ObiletApiOptions>(options =>
-{
-    builder.Configuration.GetSection("ObiletApi").Bind(options);
-    options.ApiKey = builder.Configuration["ObiletApiKey"] ?? string.Empty; 
-});
 
 builder.Services.AddControllersWithViews(options =>
     {
