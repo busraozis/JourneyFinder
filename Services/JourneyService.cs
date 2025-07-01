@@ -11,7 +11,8 @@ namespace JourneyFinder.Services;
 
 public class JourneyService(
     IHttpClientFactory httpClientFactory,
-    IOptions<ObiletApiOptions> apiOptions)
+    IOptions<ObiletApiOptions> apiOptions,
+    ILogger<JourneyService> logger)
     : IJourneyService
 {
     private readonly ObiletApiOptions _apiOptions = apiOptions.Value;
@@ -20,25 +21,34 @@ public class JourneyService(
     {
         var client = httpClientFactory.CreateClient();
         client.BaseAddress = new Uri(_apiOptions.BaseUrl);
-        
-        var apiClientToken = _apiOptions.ApiKey;
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiClientToken);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", _apiOptions.ApiKey);
 
+        var endpoint = _apiOptions.Endpoints.GetJourneys;
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await client.PostAsync(_apiOptions.Endpoints.GetJourneys, content);
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            throw new Exception("API isteği başarısız oldu");
+            var response = await client.PostAsync(endpoint, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                logger.LogError("Failed to get journeys. StatusCode: {StatusCode}, Response: {Response}", response.StatusCode, errorContent);
+                return new List<BusJourneyResponse>();
+            }
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            var journeyResponse = JsonSerializer.Deserialize<BaseResponse<List<BusJourneyResponse>>>(responseContent, options);
+
+            return journeyResponse?.Data ?? new List<BusJourneyResponse>();
         }
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-        var journeyResponse = JsonSerializer.Deserialize<BaseResponse<List<BusJourneyResponse>>>(responseContent, options);
-
-        return journeyResponse?.Data ?? new List<BusJourneyResponse>();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An exception occurred while calling GetBusJourneys.");
+            throw;
+        }
     }
 }

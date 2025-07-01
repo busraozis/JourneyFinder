@@ -11,7 +11,8 @@ namespace JourneyFinder.Services;
 
 public class SessionService(
     IHttpClientFactory httpClientFactory,
-    IOptions<ObiletApiOptions> apiOptions)
+    IOptions<ObiletApiOptions> apiOptions,
+    ILogger<SessionService> logger)
     : ISessionService
 {
     private readonly ObiletApiOptions _apiOptions = apiOptions.Value;
@@ -20,28 +21,44 @@ public class SessionService(
     {
         var client = httpClientFactory.CreateClient();
         client.BaseAddress = new Uri(_apiOptions.BaseUrl);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", _apiOptions.ApiKey);
 
-        var apiClientToken = _apiOptions.ApiKey;
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", apiClientToken);
-
+        var endpoint = _apiOptions.Endpoints.GetSession;
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await client.PostAsync(_apiOptions.Endpoints.GetSession, content);
+        try
+        {
+            var response = await client.PostAsync(endpoint, content);
 
-        response.EnsureSuccessStatusCode();
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-        var sessionResponse = JsonSerializer.Deserialize<BaseResponse<SessionResponse>>(responseContent, options);
-
-        if (sessionResponse != null)
-            return new SessionResponse
+            if (!response.IsSuccessStatusCode)
             {
-                SessionId = sessionResponse.Data.SessionId,
-                DeviceId = sessionResponse.Data.DeviceId
-            };
-        return null;
+                var errorContent = await response.Content.ReadAsStringAsync();
+                logger.LogError("Failed to retrieve session. StatusCode: {StatusCode}, Response: {Response}", response.StatusCode, errorContent);
+                return null;
+            }
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            var sessionResponse = JsonSerializer.Deserialize<BaseResponse<SessionResponse>>(responseContent, options);
+
+            if (sessionResponse?.Data != null)
+            {
+                return new SessionResponse
+                {
+                    SessionId = sessionResponse.Data.SessionId,
+                    DeviceId = sessionResponse.Data.DeviceId
+                };
+            }
+
+            logger.LogWarning("Session response was null or invalid.");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An exception occurred while retrieving session.");
+            throw;
+        }
     }
 }
