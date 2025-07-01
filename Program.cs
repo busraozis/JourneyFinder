@@ -2,6 +2,7 @@ using AspNetCoreRateLimit;
 using HealthChecks.UI.Client;
 using JourneyFinder.Extensions;
 using JourneyFinder.Filters;
+using JourneyFinder.Options;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -46,6 +47,12 @@ builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrateg
 
 builder.Services.AddHealthChecks()
     .AddRedis(builder.Configuration.GetConnectionString("Redis") ?? string.Empty, name: "redis", failureStatus: HealthStatus.Degraded);
+
+builder.Services.Configure<ObiletApiOptions>(options =>
+{
+    builder.Configuration.GetSection("ObiletApi").Bind(options);
+    options.ApiKey = builder.Configuration["ObiletApiKey"] ?? string.Empty; 
+});
 
 builder.Services.AddControllersWithViews(options =>
     {
