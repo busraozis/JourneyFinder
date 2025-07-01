@@ -1,6 +1,6 @@
 # JourneyFinder 🧭
 
-**JourneyFinder is a travel planning web application that allows users to search for intercity bus journeys based on selected departure and arrival locations and travel dates. It is integrated with Turkey's most widely used ticketing platform — obilet.com — via their public API.Supported languages are Turkish and English, and the app uses the browser's default language for localization.
+JourneyFinder is a travel planning web application that allows users to search for intercity bus journeys based on selected departure and arrival locations and travel dates. It is integrated with Turkey's most widely used ticketing platform — obilet.com — via their public API.Supported languages are Turkish and English, and the app uses the browser's default language for localization.
 
 ---
 
