@@ -2,7 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const departureInput = document.getElementById("departureDateInput");
     const btnToday = document.getElementById("btnToday");
     const btnTomorrow = document.getElementById("btnTomorrow");
-
+    
+    // Set default date, use existing input value or default to tomorrow
     const defaultDate = departureInput.value
         ? departureInput.value
         : new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -12,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
         locale: window.currentFlatpickrLocale || "default",
         minDate: "today",
         defaultDate: defaultDate,
-        onChange: updateTodayTomorrowButtons
+        onChange: updateTodayTomorrowButtons // Update button highlight on date change
     });
 
     btnToday.addEventListener("click", function () {
@@ -28,6 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
         updateActiveButton("btnTomorrow");
     });
 
+
+    // Highlight the correct today/tomorrow button based on selected date
     function updateTodayTomorrowButtons(selectedDates) {
         const selected = selectedDates[0];
         const today = new Date();
@@ -42,6 +45,8 @@ document.addEventListener("DOMContentLoaded", function () {
         else updateActiveButton(null);
     }
 
+
+    // Apply active class to the correct button
     function updateActiveButton(activeId) {
         [btnToday, btnTomorrow].forEach(btn => btn.classList.remove("active"));
         if (activeId) document.getElementById(activeId).classList.add("active");
@@ -56,7 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
         [origin.value, dest.value] = [dest.value, origin.value];
         [originId.value, destId.value] = [destId.value, originId.value];
     });
-
+    
+    // Validate form submission if origin and destination are the same
     document.querySelector(".submit-button").addEventListener("click", function (e) {
         const originId = document.getElementById("OriginId").value;
         const destinationId = document.getElementById("DestinationId").value;
@@ -70,11 +76,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // If a date is already today/tomorrow, choose the appropriate button
     if (departureInput.value) {
         const parsed = fp.parseDate(departureInput.value, "d F Y");
-        if (parsed) updateTodayTomorrowButtons([parsed]);
+        if (parsed) 
+            updateTodayTomorrowButtons([parsed]);
     }
-
+    
+    // Select autocomplete elements
     const originInput = document.getElementById("originInput");
     const originIdInput = document.getElementById("OriginId");
     const originDropdown = document.getElementById("originDropdown");
@@ -82,10 +91,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const destinationInput = document.getElementById("destinationInput");
     const destinationIdInput = document.getElementById("DestinationId");
     const destinationDropdown = document.getElementById("destinationDropdown");
-
+    
+    // Setup autocomplete dropdown functionality
     function setupDropdown(inputEl, hiddenIdEl, dropdownEl) {
         let currentIndex = -1;
 
+        // Filter and display suggestions on input
         inputEl.addEventListener("input", function () {
             const query = this.value.toLowerCase();
             dropdownEl.innerHTML = "";
@@ -118,7 +129,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             dropdownEl.style.display = "block";
         });
-
+        
+        // Handle keyboard navigation (arrow keys and enter)
         inputEl.addEventListener("keydown", function (e) {
             const items = dropdownEl.querySelectorAll("li");
             if (dropdownEl.style.display !== "block" || items.length === 0) return;
@@ -139,6 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
+        // Highlight the currently selected item
         function updateActiveItem(items) {
             items.forEach((item, idx) => {
                 if (idx === currentIndex) {
@@ -150,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-
+        // Close dropdown if clicked outside
         document.addEventListener("click", function (e) {
             if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
                 dropdownEl.style.display = "none";
