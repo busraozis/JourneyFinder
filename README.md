@@ -49,6 +49,7 @@ JourneyFinder is a travel planning web application that allows users to search f
        "Redis": "localhost:6379"
      },
      "ObiletApi": {
+       "ApiKey": "YOUR_API_KEY_HERE",
        "BaseUrl": "https://v2-api.obilet.com/api/",
        "Endpoints": {
          "GetBusLocations": "location/getbuslocations",
