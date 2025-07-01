@@ -30,32 +30,44 @@ JourneyFinder is a travel planning web application that allows users to search f
 
 1. Clone the repository:
 
+   ```bash
    git clone https://github.com/busraozis/JourneyFinder.git
    cd JourneyFinder
+   ```
 
 2. Create an .env file in the root directory:
 
-  ObiletApi__ApiKey=YOUR_API_KEY_HERE
+   ```ini
+     ObiletApi__ApiKey=YOUR_API_KEY_HERE
+   ```
 
 3. Start Redis
 
-  docker run --name journey-redis -p 6379:6379 redis
+   ```bash
+     docker run --name journey-redis -p 6379:6379 redis
+   ```
 
 4. Run the application:
 
-  dotnet restore
-  dotnet run
+   ```bash
+     dotnet restore
+     dotnet run
+   ```
 
 
 ### 🐳 Run with Docker
 
 1. Create a .env file in the root directory:
-
-  ObiletApi__ApiKey=YOUR_API_KEY_HERE
+   
+   ```ini
+     ObiletApi__ApiKey=YOUR_API_KEY_HERE
+   ```
 
 2. Start the application using Docker Compose:
 
-  docker compose up --build
+   ```bash
+     docker compose up --build
+   ```
 
 3. Go to: http://localhost:5000
 
