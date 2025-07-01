@@ -11,7 +11,6 @@ public class PersistentCookieActionFilter : IActionFilter
 
         EnsurePersistentCookie(request, response, "SessionId");
         EnsurePersistentCookie(request, response, "DeviceId");
-        //EnsurePersistentCookie(request, response, "UserId");
     }
 
     private void EnsurePersistentCookie(HttpRequest request, HttpResponse response, string cookieName)

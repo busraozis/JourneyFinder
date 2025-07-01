@@ -1,4 +1,4 @@
-using JourneyFinder.Dtos;
+using JourneyFinder.Models.Dtos;
 using JourneyFinder.Models.Responses;
 
 namespace JourneyFinder.Managers.Interfaces;

@@ -1,5 +1,5 @@
 using JourneyFinder.Managers.Interfaces;
-using JourneyFinder.Settings;
+using JourneyFinder.Options;
 using Microsoft.Extensions.Options;
 
 namespace JourneyFinder.Managers;

@@ -1,5 +1,5 @@
-using JourneyFinder.Dtos;
 using JourneyFinder.Managers.Interfaces;
+using JourneyFinder.Models.Dtos;
 using JourneyFinder.Models.Requests;
 using JourneyFinder.Models.Responses;
 using JourneyFinder.Services.Interfaces;

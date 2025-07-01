@@ -9,7 +9,6 @@ using JourneyFinder.Managers.Interfaces;
 using JourneyFinder.Options;
 using JourneyFinder.Services;
 using JourneyFinder.Services.Interfaces;
-using JourneyFinder.Settings;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 

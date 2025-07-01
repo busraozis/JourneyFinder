@@ -1,4 +1,4 @@
-namespace JourneyFinder.Dtos;
+namespace JourneyFinder.Models.Dtos;
 
 public class JourneyDto
 {

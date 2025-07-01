@@ -13,9 +13,9 @@ public class JourneyValidationFilter : IActionFilter
             int originId = (int)originIdObj;
             int destinationId = (int)destinationIdObj;
 
-            if (originId <= 0 || destinationId <= 0)
+            if (originId == destinationId)
             {
-                context.Result = new BadRequestObjectResult("OriginId ve DestinationId pozitif olmalıdır.");
+                context.Result = new BadRequestObjectResult("Origin and Destionation cannot be same.");
                 return;
             }
         }
@@ -25,7 +25,7 @@ public class JourneyValidationFilter : IActionFilter
             DateTime departureDate = (DateTime) departureDateObj;
             if (departureDate < DateTime.Today)
             {
-                context.Result = new BadRequestObjectResult("Geçmiş bir tarih seçilemez.");
+                context.Result = new BadRequestObjectResult("Departure date must be after Today.");
             }
         }
     }
