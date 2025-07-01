@@ -1,4 +1,4 @@
-# JourneyFinder 🧭
+# JourneyFinder 
 
 JourneyFinder is a travel planning web application that allows users to search for intercity bus journeys based on selected departure and arrival locations and travel dates. It is integrated with Turkey's most widely used ticketing platform — obilet.com — via their public API.Supported languages are Turkish and English, and the app uses the browser's default language for localization.
 
@@ -40,14 +40,31 @@ JourneyFinder is a travel planning web application that allows users to search f
    ```ini
      ObiletApi__ApiKey=YOUR_API_KEY_HERE
    ```
+   
+3. Add appsettings.Development.json file in the root directory:
 
-3. Start Redis
+
+   ```ini
+   "ConnectionStrings": {
+       "Redis": "localhost:6379"
+     },
+     "ObiletApi": {
+       "BaseUrl": "https://v2-api.obilet.com/api/",
+       "Endpoints": {
+         "GetBusLocations": "location/getbuslocations",
+         "GetSession": "client/getsession",
+         "GetJourneys": "journey/getbusjourneys"
+       }
+     }
+   ```
+
+5. Start Redis
 
    ```bash
      docker run --name journey-redis -p 6379:6379 redis
    ```
 
-4. Run the application:
+6. Run the application:
 
    ```bash
      dotnet restore
