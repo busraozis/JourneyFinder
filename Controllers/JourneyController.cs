@@ -1,8 +1,8 @@
 using System.Globalization;
 using JourneyFinder.Builders;
-using JourneyFinder.Dtos;
 using JourneyFinder.Filters;
 using JourneyFinder.Managers.Interfaces;
+using JourneyFinder.Models.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JourneyFinder.Controllers;

@@ -1,4 +1,4 @@
-using JourneyFinder.Dtos;
+using JourneyFinder.Models.Dtos;
 using JourneyFinder.Models.Responses;
 using JourneyFinder.Services.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;

@@ -2,7 +2,6 @@ using AspNetCoreRateLimit;
 using HealthChecks.UI.Client;
 using JourneyFinder.Extensions;
 using JourneyFinder.Filters;
-using JourneyFinder.Options;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Razor;

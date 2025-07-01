@@ -1,4 +1,4 @@
-namespace JourneyFinder.Settings;
+namespace JourneyFinder.Options;
 
 public class CookieSettings
 {
