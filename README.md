@@ -81,13 +81,31 @@ JourneyFinder is a travel planning web application that allows users to search f
      ObiletApi__ApiKey=YOUR_API_KEY_HERE
    ```
 
-2. Start the application using Docker Compose:
+2. Add appsettings.Development.json file in the root directory:
+
+
+   ```ini
+   "ConnectionStrings": {
+       "Redis": "localhost:6379"
+     },
+     "ObiletApi": {
+       "ApiKey": "YOUR_API_KEY_HERE",
+       "BaseUrl": "https://v2-api.obilet.com/api/",
+       "Endpoints": {
+         "GetBusLocations": "location/getbuslocations",
+         "GetSession": "client/getsession",
+         "GetJourneys": "journey/getbusjourneys"
+       }
+     }
+   ```
+
+3. Start the application using Docker Compose:
 
    ```bash
      docker compose up --build
    ```
 
-3. Go to: http://localhost:5000
+4. Go to: http://localhost:5000
 
 
 
