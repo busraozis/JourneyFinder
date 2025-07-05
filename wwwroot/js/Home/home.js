@@ -91,46 +91,59 @@ document.addEventListener("DOMContentLoaded", function () {
     const destinationInput = document.getElementById("destinationInput");
     const destinationIdInput = document.getElementById("DestinationId");
     const destinationDropdown = document.getElementById("destinationDropdown");
+
+    setupAutocomplete(originInput, originIdInput, originDropdown);
+    setupAutocomplete(destinationInput, destinationIdInput, destinationDropdown);
     
     // Setup autocomplete dropdown functionality
-    function setupDropdown(inputEl, hiddenIdEl, dropdownEl) {
+    function setupAutocomplete(inputEl, hiddenIdEl, dropdownEl) {
         let currentIndex = -1;
+        let debounceTimer;
 
-        // Filter and display suggestions on input
         inputEl.addEventListener("input", function () {
-            const query = this.value.toLowerCase();
+            const query = this.value.trim();
             dropdownEl.innerHTML = "";
             currentIndex = -1;
 
+            clearTimeout(debounceTimer);
             if (!query) {
                 dropdownEl.style.display = "none";
                 return;
             }
 
-            const filtered = locations.filter(loc => loc.Text.toLowerCase().includes(query));
-            if (filtered.length === 0) {
-                dropdownEl.style.display = "none";
-                return;
-            }
+            debounceTimer = setTimeout(() => {
+                fetch("/Home/SearchLocations", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(query)
+                })
+                    .then(res => res.json())
+                    .then(locations => {
+                        if (!locations.length) {
+                            dropdownEl.style.display = "none";
+                            return;
+                        }
 
-            filtered.forEach((loc, i) => {
-                const li = document.createElement("li");
-                li.textContent = loc.Text;
-                li.dataset.id = loc.Value;
-                li.setAttribute("data-index", i);
-                li.addEventListener("click", function () {
-                    inputEl.value = loc.Text;
-                    hiddenIdEl.value = loc.Value;
-                    dropdownEl.innerHTML = "";
-                    dropdownEl.style.display = "none";
-                });
-                dropdownEl.appendChild(li);
-            });
+                        locations.forEach((loc, i) => {
+                            const li = document.createElement("li");
+                            li.textContent = loc.text;
+                            li.dataset.id = loc.value;
+                            li.setAttribute("data-index", i);
+                            li.addEventListener("click", function () {
+                                inputEl.value = loc.text;
+                                hiddenIdEl.value = loc.value;
+                                dropdownEl.innerHTML = "";
+                                dropdownEl.style.display = "none";
+                            });
+                            dropdownEl.appendChild(li);
+                        });
 
-            dropdownEl.style.display = "block";
+                        dropdownEl.style.display = "block";
+                    })
+                    .catch(console.error);
+            }, 300);
         });
-        
-        // Handle keyboard navigation (arrow keys and enter)
+
         inputEl.addEventListener("keydown", function (e) {
             const items = dropdownEl.querySelectorAll("li");
             if (dropdownEl.style.display !== "block" || items.length === 0) return;
@@ -151,26 +164,19 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Highlight the currently selected item
         function updateActiveItem(items) {
             items.forEach((item, idx) => {
+                item.classList.toggle("active", idx === currentIndex);
                 if (idx === currentIndex) {
-                    item.classList.add("active");
                     item.scrollIntoView({ block: "nearest" });
-                } else {
-                    item.classList.remove("active");
                 }
             });
         }
 
-        // Close dropdown if clicked outside
         document.addEventListener("click", function (e) {
             if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
                 dropdownEl.style.display = "none";
             }
         });
     }
-
-    setupDropdown(originInput, originIdInput, originDropdown);
-    setupDropdown(destinationInput, destinationIdInput, destinationDropdown);
 });

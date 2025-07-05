@@ -26,4 +26,16 @@ public class HomeController(
         ViewData["ShowJourneyInfo"] = false;
         return View(model);
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> SearchLocations([FromBody] string? input)
+    {
+        var keyword = input;
+
+        var (sessionId, deviceId) = await sessionManager.GetOrCreateSessionAsync(HttpContext);
+        var results = await busLocationManager.SearchLocationsAsync(keyword, sessionId, deviceId, UserLanguage);
+
+        var formatted = results.Select(r => new { text = r.LongName, value = r.Id });
+        return Json(formatted);
+    }
 }

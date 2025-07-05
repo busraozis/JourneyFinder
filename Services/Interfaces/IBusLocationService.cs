@@ -5,5 +5,5 @@ namespace JourneyFinder.Services.Interfaces;
 
 public interface IBusLocationService
 {
-    Task<List<BusLocationResponse>> GetBusLocationsAsync(BaseRequest<BusLocationRequest> request);
+    Task<List<BusLocationResponse>> GetBusLocationsAsync(BaseRequest<string?> request);
 }

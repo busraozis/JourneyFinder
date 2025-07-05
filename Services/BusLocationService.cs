@@ -17,7 +17,7 @@ public class BusLocationService(
 {
     private readonly ObiletApiOptions _apiOptions = apiOptions.Value;
 
-    public async Task<List<BusLocationResponse>> GetBusLocationsAsync(BaseRequest<BusLocationRequest> request)
+    public async Task<List<BusLocationResponse>> GetBusLocationsAsync(BaseRequest<string?> request)
     {
         var client = httpClientFactory.CreateClient();
         client.BaseAddress = new Uri(_apiOptions.BaseUrl);

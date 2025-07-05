@@ -42,10 +42,10 @@ public class BusLocationServiceTests
     public async Task GetBusLocationsAsync_ReturnsList_WhenResponseIsSuccessful()
     {
         // Arrange
-        var request = new BaseRequest<BusLocationRequest>
+        var request = new BaseRequest<string?>
         {
             DeviceSession = new DeviceSession(),
-            Data = new BusLocationRequest()
+            Data = null!
         };
 
         var expectedData = new List<BusLocationResponse>
