@@ -28,7 +28,9 @@ public class JourneyController(IJourneyManager journeyManager, IJourneyViewModel
             OriginId = originId,
             DestinationId = destinationId,
             DepartureDate = departureDate,
-            Language = UserLanguage
+            Language = UserLanguage,
+            OriginName = originName,
+            DestinationName = destinationName
         };
 
         var journeys = await journeyManager.GetJourneysAsync(sessionId, deviceId, dto);

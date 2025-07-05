@@ -7,16 +7,16 @@ namespace JourneyFinder.Builders;
 
 public interface IHomeViewModelBuilder
 {
-    HomeIndexViewModel Build(IEnumerable<BusLocationResponse> locations, LastSearchResult? lastSearch);
+    HomeIndexViewModel Build(IEnumerable<BusLocationResponse>? locations, LastSearchResult? lastSearch);
 }
 
 public class HomeViewModelBuilder : IHomeViewModelBuilder
 {
-    public HomeIndexViewModel Build(IEnumerable<BusLocationResponse> locations, LastSearchResult? lastSearch)
+    public HomeIndexViewModel Build(IEnumerable<BusLocationResponse>? locations, LastSearchResult? lastSearch)
     {
         return new HomeIndexViewModel
         {
-            Locations = locations.Select(loc => new SelectListItem
+            Locations = locations?.Select(loc => new SelectListItem
             {
                 Text = loc.Name,
                 Value = loc.Id.ToString()

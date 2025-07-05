@@ -7,7 +7,7 @@ namespace JourneyFinder.Services;
 
 public class RedisCacheService(IDistributedCache cache) : IRedisCacheService
 {
-    public async Task<LastSearchResult?> GetLastSearchAsync(string sessionId, string deviceId, IEnumerable<BusLocationResponse> locations)
+    public async Task<LastSearchResult?> GetLastSearchAsync(string sessionId, string deviceId)
     {
         var key = $"session:{sessionId}:{deviceId}:lastSearch";
         var searchData = await cache.GetStringAsync(key);
@@ -16,26 +16,19 @@ public class RedisCacheService(IDistributedCache cache) : IRedisCacheService
 
         var parts = searchData.Split('|');
         if (parts.Length != 3) return null;
+        
+        var originName = parts[0];
+        var destinationName = parts[1];
+        var departureDateOk = DateTime.TryParse(parts[2], out var departureDate);
 
-        if (int.TryParse(parts[0], out var originId) &&
-            int.TryParse(parts[1], out var destinationId) &&
-            DateTime.TryParse(parts[2], out var departureDate))
+        if (!departureDateOk) return null;
+
+        return new LastSearchResult
         {
-            var busLocationResponses = locations as BusLocationResponse[] ?? locations.ToArray();
-            var originName = busLocationResponses.FirstOrDefault(x => x.Id == originId)?.Name;
-            var destinationName = busLocationResponses.FirstOrDefault(x => x.Id == destinationId)?.Name;
-
-            return new LastSearchResult
-            {
-                OriginId = originId,
-                DestinationId = destinationId,
-                DepartureDate = departureDate,
-                OriginName = originName,
-                DestinationName = destinationName
-            };
-        }
-
-        return null;
+            OriginName = originName,
+            DestinationName = destinationName,
+            DepartureDate = departureDate
+        };
     }
 
     public async Task<bool> SessionExistsAsync(string sessionId, string deviceId)

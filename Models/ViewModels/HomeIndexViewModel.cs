@@ -4,7 +4,7 @@ namespace JourneyFinder.Models.ViewModels;
 
 public class HomeIndexViewModel
 {
-    public List<SelectListItem> Locations { get; set; }
+    public List<SelectListItem>? Locations { get; set; }
     public int? OriginId { get; set; }
     public int? DestinationId { get; set; }
     public string? OriginName { get; set; } 

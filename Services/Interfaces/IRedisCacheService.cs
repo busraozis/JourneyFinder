@@ -5,7 +5,7 @@ namespace JourneyFinder.Services.Interfaces;
 
 public interface IRedisCacheService
 {
-    Task<LastSearchResult?> GetLastSearchAsync(string sessionId, string deviceId, IEnumerable<BusLocationResponse> locations);
+    Task<LastSearchResult?> GetLastSearchAsync(string sessionId, string deviceId);
     Task<bool> SessionExistsAsync(string sessionId, string deviceId);
     Task SetSessionValidAsync(string sessionId, string deviceId, TimeSpan duration);
 }

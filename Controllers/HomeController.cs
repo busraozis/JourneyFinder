@@ -17,11 +17,22 @@ public class HomeController(
     public async Task<IActionResult> Index()
     {
         var (sessionId, deviceId) = await sessionManager.GetOrCreateSessionAsync(HttpContext);
-        var locations = await busLocationManager.GetLocationsAsync(sessionId, deviceId, UserLanguage);
-        var busLocationResponses = locations as BusLocationResponse[] ?? locations.ToArray();
-        var lastSearch = await redisCacheService.GetLastSearchAsync(sessionId, deviceId, busLocationResponses);
+        var lastSearch = await redisCacheService.GetLastSearchAsync(sessionId, deviceId);
+        var origin = await busLocationManager.SearchLocationsAsync(lastSearch?.OriginName ?? null, sessionId, deviceId, UserLanguage);
+        var destination = await busLocationManager.SearchLocationsAsync(lastSearch?.DestinationName ?? null, sessionId, deviceId, UserLanguage);
+        
+        var originResponse = origin.ToList();
+        var destinationResponse = destination.ToList();
+        
+        var locations = originResponse.Union(destinationResponse) as BusLocationResponse[];
 
-        var model = viewModelBuilder.Build(busLocationResponses, lastSearch);
+        if (lastSearch != null)
+        {
+            lastSearch.OriginId = originResponse[0].Id;
+            lastSearch.DestinationId = destinationResponse[0].Id;
+        }
+
+        var model = viewModelBuilder.Build(locations, lastSearch);
         
         ViewData["ShowJourneyInfo"] = false;
         return View(model);
