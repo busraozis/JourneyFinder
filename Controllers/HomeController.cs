@@ -26,12 +26,6 @@ public class HomeController(
         
         var locations = originResponse.Union(destinationResponse) as BusLocationResponse[];
 
-        if (lastSearch != null)
-        {
-            lastSearch.OriginId = originResponse[0].Id;
-            lastSearch.DestinationId = destinationResponse[0].Id;
-        }
-
         var model = viewModelBuilder.Build(locations, lastSearch);
         
         ViewData["ShowJourneyInfo"] = false;

@@ -31,7 +31,7 @@ public class JourneyManager(IJourneyService journeyService, IDistributedCache ca
         var journeys = await journeyService.GetBusJourneysAsync(request);
 
         var searchKey = $"session:{sessionId}:{deviceId}:lastSearch";
-        var searchValue = $"{dto.OriginName}|{dto.DestinationName}|{dto.DepartureDate:yyyy-MM-dd}";
+        var searchValue = $"{dto.OriginName}|{dto.DestinationName}|{dto.DepartureDate:yyyy-MM-dd}|{dto.OriginId}|{dto.DestinationId}";
 
         await cache.SetStringAsync(searchKey, searchValue, new DistributedCacheEntryOptions
         {

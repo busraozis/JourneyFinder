@@ -1,5 +1,4 @@
 using JourneyFinder.Models.Dtos;
-using JourneyFinder.Models.Responses;
 using JourneyFinder.Services.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -15,11 +14,13 @@ public class RedisCacheService(IDistributedCache cache) : IRedisCacheService
         if (string.IsNullOrEmpty(searchData)) return null;
 
         var parts = searchData.Split('|');
-        if (parts.Length != 3) return null;
+        if (parts.Length != 5) return null;
         
         var originName = parts[0];
         var destinationName = parts[1];
         var departureDateOk = DateTime.TryParse(parts[2], out var departureDate);
+        int.TryParse(parts[3], out var originId);
+        int.TryParse(parts[4], out var destinationId);
 
         if (!departureDateOk) return null;
 
@@ -27,7 +28,9 @@ public class RedisCacheService(IDistributedCache cache) : IRedisCacheService
         {
             OriginName = originName,
             DestinationName = destinationName,
-            DepartureDate = departureDate
+            DepartureDate = departureDate,
+            OriginId = originId,
+            DestinationId = destinationId
         };
     }
 

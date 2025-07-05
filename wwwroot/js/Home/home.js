@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         dropdownEl.style.display = "block";
                     })
                     .catch(console.error);
-            }, 300);
+            }, 500);
         });
 
         inputEl.addEventListener("keydown", function (e) {
