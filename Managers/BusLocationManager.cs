@@ -6,26 +6,12 @@ namespace JourneyFinder.Managers;
 
 public interface IBusLocationManager
 {
-    Task<IEnumerable<BusLocationResponse>> GetLocationsAsync(string sessionId, string deviceId, string language);
     Task<IEnumerable<BusLocationResponse>> SearchLocationsAsync(string? keyword, string sessionId, string deviceId, string language);
 
 }
 
 public class BusLocationManager(IBusLocationService service) : IBusLocationManager
 {
-    public async Task<IEnumerable<BusLocationResponse>> GetLocationsAsync(string sessionId, string deviceId, string language)
-    {
-        var request = new BaseRequest<string?>
-        {
-            DeviceSession = new DeviceSession { SessionId = sessionId, DeviceId = deviceId },
-            Date = DateTime.UtcNow.ToShortDateString(),
-            Language = language,
-            Data = null!
-        };
-
-        return await service.GetBusLocationsAsync(request);
-    }
-    
     public async Task<IEnumerable<BusLocationResponse>> SearchLocationsAsync(string? keyword, string sessionId, string deviceId, string language)
     {
         var request = new BaseRequest<string?>
